@@ -21,7 +21,8 @@
 
 <body>
     <h2 class="jumbotron">
-        <p>Welcome, {{request.name}}</p>
+        <p>Welcome, {{request.user.profile.name}}</p>
+        <a style="float: right;" href="{% url 'logout' %}">Logout</a>
         Currently active forums: {{count}}
         <form method="POST" action="{% url 'addInForum' %}">
             {% csrf_token %}
@@ -44,22 +45,29 @@
                 <p>{{forum.description}}</p>
         </h5>
         <hr>
-        <p> By: {{forum.name}}</p>
-        email- {{forum.email}}
+        <p> By: {{forum.profile}}</p>
+        email: {{forum.profile.user.email}}
         <hr>
-        <h4>Views from other users</h4>
+        <h4>Comment from other users</h4>
+        <hr>
         {%for discuss in discussions%}
             {%for objs in discuss%}
                 {% if objs.forum == forum %}
-                    {{objs.discuss}}
+                    <div style="float: left; display: flex;">
+                        {% if objs.user == NULL %}
+                            <p style="font-weight: bold;">@Unknow</p> : 
+                        {% else %}
+                            <p style="font-weight: bold;">@{{objs.user.username}}</p> : 
+                        {% endif %}
+                        <p style="margin-left: 5px;">{{objs.discuss}}</p>
+                    </div>
+
                     <br>
                 {% endif %}
             {%endfor%}
         {%endfor%}
-        <form method="POST" action="{% url 'addInDiscussion' %}">
-            {% csrf_token %}
-            <button class="btn btn-success" style="width:fit-content; padding: 4px; margin:10px;">Add more</button>
-        </form>
+     
+            <a href="{% url 'addInDiscussion' forum.id %}" class="btn btn-success" style="width:fit-content; padding: 4px; margin:10px;">Add more</a>
     </div>
     </div>
     </div>

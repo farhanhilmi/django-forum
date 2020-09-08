@@ -12,6 +12,8 @@
 </head>
 <form action="{% url 'addInForum' %}" method="POST">
     {% csrf_token %}
+    {{request.user.profile.id}}
+
     {{form.as_p}}
     <input type="submit" class="btn btn-success" value="submit">
 </form>

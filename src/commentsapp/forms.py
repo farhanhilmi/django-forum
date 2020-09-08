@@ -7,13 +7,28 @@ from .models import *
     
 class CreateInForum(ModelForm):
     class Meta:
-        model= forum
+        model = forum
         fields = "__all__"
+        exclude = ['profile']
+
+    # def __init__(self, *args, **kwargs):
+    #     self._profile = kwargs.pop('profile')
+    #     super(CreateInForum, self).__init__(*args, **kwargs)
+
+    # def save(self, commit=True):
+    #     inst = super(CreateInForum, self).save(commit=False)
+    #     inst.profile = self._profile
+    #     if commit:
+    #         inst.save()
+    #         self.save_m2m()
+
+    #     return inst
     
 class CreateInDiscussion(ModelForm):
     class Meta:
         model= Discussion
         fields = "__all__"
+        exclude = ['forum','user']
 
 class CreateUser(UserCreationForm):
     class Meta:

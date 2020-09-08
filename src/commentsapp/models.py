@@ -17,7 +17,7 @@ class profile(models.Model):
 class forum(models.Model):
     # discuss = models.OneToOneField(Discussion, blank=True, null=True, on_delete=models.SET_NULL)
     # name=models.CharField(max_length=200,default="anonymous" )
-    user = models.ForeignKey(profile, null=True, blank=True,on_delete=models.SET_NULL)
+    profile = models.ForeignKey(profile, null=True, blank=True,on_delete=models.SET_NULL)
     topic= models.CharField(max_length=300)
     description = models.CharField(max_length=1000,blank=True)
     link = models.CharField(max_length=100 ,null =True)
@@ -28,7 +28,8 @@ class forum(models.Model):
  
 #child model
 class Discussion(models.Model):
-    forum = models.ForeignKey(forum,blank=True,on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True,on_delete=models.CASCADE)
+    forum = models.ForeignKey(forum,blank=True, null=True, on_delete=models.CASCADE)
     discuss = models.CharField(max_length=1000)
  
     def __str__(self):

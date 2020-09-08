@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
+from django.contrib.auth.decorators import login_required
 
 from .models import *
 from .forms import *
@@ -41,10 +42,18 @@ def loginPage(request):
     context = {}
     return render(request, 'auth/login.html', context)
 
+def logoutPage(request):
+    logout(request)
+    return redirect('login')
+
+@login_required(login_url='login')
 def home(request):
+    users = request.user.profile.id
     forums = forum.objects.all()
     count = forums.count()
     discussions = []
+    # print(request.user.profile.id)
+    print(forums)
 
     for i in forums:
         discussions.append(i.discussion_set.all())
@@ -55,6 +64,7 @@ def home(request):
 def viewForum(request,pk):
     forum_id = forum.objects.get(id=pk)
     discuss_id = Discussion.objects.filter(forum_id=forum_id.id)
+    profiles = profile.objects.all()
     # print(discuss_id.discuss)
     # discuss = discuss_id.filter(forum=forum_id.topic)
 
@@ -62,22 +72,30 @@ def viewForum(request,pk):
     return render(request, 'view_forum.html', context)
 
 def addInForum(request):
+    # profiles = request.user.profile
     form = CreateInForum()
+    # print(forum)
+    # print(profiles)
     if request.method == 'POST':
         form = CreateInForum(request.POST)
         if form.is_valid():
-            form.save()
+            data = form.save()
+            data.profile = profile.objects.get(id=request.user.profile.id)
+            data.save()
             return redirect('/')
 
     context = {'form': form}
     return render(request, 'addInForum.html', context)
 
-def addInDiscussion(request):
+def addInDiscussion(request,pk):
     form = CreateInDiscussion()
     if request.method == 'POST':
         form = CreateInDiscussion(request.POST)
         if form.is_valid():
-            form.save()
+            data = form.save()
+            data.forum = forum.objects.get(id=pk)
+            data.user = User.objects.get(id=request.user.id)
+            data.save()
             return redirect('/')
     
     context = {'form': form}

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 
-from .models import profile
+from .models import profile, forum
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -19,6 +19,14 @@ def Profile_signals(sender, instance, created, **kwargs):
 
 # parameter pertama receiver kedua sender
 post_save.connect(Profile_signals, sender=User)
+
+
+# def Forum_signals(sender, instance, created, **kwargs):
+#     if created:
+#         forum.objects.create(
+#             forum=instance,
+
+#         )
 
 # @receiver(post_save, sender=User)
 # def update_profile(sender, instace, created, **kwargs):
