@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h3>{{forum.topic}}</h3>
+    <small>By: {{forum.name}}</small> | <small>{{forum.email}}</small><br>
+    <small>On {{forum.date_created}}</small>
+    <hr>
+    <p>{{forum.description}}</p>
+    <hr>
+    {% for dis in discuss %}
+        <p>{{dis.discuss}}</p>
+    {% endfor %}
+</body>
+
+</html>
