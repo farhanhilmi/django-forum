@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Sum
 
 from .models import *
 from .forms import *
@@ -49,16 +50,15 @@ def logoutPage(request):
 @login_required(login_url='login')
 def home(request):
     users = request.user.profile.id
-    forums = forum.objects.all()
-    count = forums.count()
+    forums = forum.objects.all().annotate(total=Sum('profile'))
+  
+    countForum = forums.count()
     discussions = []
-    # print(request.user.profile.id)
-    print(forums)
 
     for i in forums:
         discussions.append(i.discussion_set.all())
 
-    context = {'forums': forums, 'count': count, 'discussions': discussions}
+    context = {'forums': forums, 'countForum': countForum, 'discussions': discussions}
     return render(request, 'home.html', context)
 
 def viewForum(request,pk):
@@ -81,22 +81,52 @@ def addInForum(request):
         if form.is_valid():
             data = form.save()
             data.profile = profile.objects.get(id=request.user.profile.id)
+            data.num_comment = 0
             data.save()
             return redirect('/')
 
     context = {'form': form}
     return render(request, 'addInForum.html', context)
 
+def deleteForum(request,pk):
+    forums = forum.objects.get(id=pk)
+  
+    forums.delete()
+    return redirect('/')
+
+
+def likeComment(request,pk):
+    form = Discussion.objects.get(id=pk)
+    data = form.save()
+    data.like = form.like + 1
+    data.save()
+
+    print(form.like)
+    return redirect('/')
+
 def addInDiscussion(request,pk):
+    forums = forum.objects.get(id=pk)
+    comment = updateCommentForm(instance=forums)
+    
+    print(type(forums.num_comment))
+    print(forums.num_comment)
+
     form = CreateInDiscussion()
     if request.method == 'POST':
+        comment = updateCommentForm(request.POST, instance=forums)
         form = CreateInDiscussion(request.POST)
-        if form.is_valid():
+        if form.is_valid() and comment.is_valid():
+            dataComment = comment.save()
             data = form.save()
+            dataComment.num_comment = forums.num_comment + 1
             data.forum = forum.objects.get(id=pk)
             data.user = User.objects.get(id=request.user.id)
+            data.like = 0
+
+            dataComment.save()
             data.save()
+
             return redirect('/')
     
-    context = {'form': form}
+    context = {'form': form,'comment': comment}
     return render(request, 'addInDiscussion.html', context)

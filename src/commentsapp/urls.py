@@ -11,6 +11,9 @@ urlpatterns = [
 
     path('view_forum/<str:pk>', views.viewForum, name='view_forum'),
     path('addInForum/', views.addInForum, name='addInForum'),
+    path('deleteForum/<str:pk>', views.deleteForum, name='deleteForum'),
+
     path('addInDiscussion/<str:pk>/', views.addInDiscussion, name='addInDiscussion'),
+    path('likeComment/<str:pk>/', views.likeComment, name='likeComment'),
 
 ]

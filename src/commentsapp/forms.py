@@ -9,7 +9,7 @@ class CreateInForum(ModelForm):
     class Meta:
         model = forum
         fields = "__all__"
-        exclude = ['profile']
+        exclude = ['profile','num_comment']
 
     # def __init__(self, *args, **kwargs):
     #     self._profile = kwargs.pop('profile')
@@ -23,12 +23,17 @@ class CreateInForum(ModelForm):
     #         self.save_m2m()
 
     #     return inst
+
+class updateCommentForm(ModelForm):
+    class Meta:
+        model = forum
+        fields = ['num_comment']
     
 class CreateInDiscussion(ModelForm):
     class Meta:
         model= Discussion
         fields = "__all__"
-        exclude = ['forum','user']
+        exclude = ['forum','user','like']
 
 class CreateUser(UserCreationForm):
     class Meta:

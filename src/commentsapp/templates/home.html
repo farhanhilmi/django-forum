@@ -23,7 +23,7 @@
     <h2 class="jumbotron">
         <p>Welcome, {{request.user.profile.name}}</p>
         <a style="float: right;" href="{% url 'logout' %}">Logout</a>
-        Currently active forums: {{count}}
+        Currently active forums: {{countForum}}
         <form method="POST" action="{% url 'addInForum' %}">
             {% csrf_token %}
             <button class="btn btn-success" style="width:fit-content; padding: 4px; margin:10px;">Add more</button>
@@ -38,6 +38,7 @@
         <br>
         <h5 class="card-title">
             <!-- <a href='{{forum.link}}'> -->
+            <a href="{% url 'deleteForum' forum.id %}"><small>Hapus</small></a>
             <a href="{% url 'view_forum' forum.id %}">
                 <h3>{{forum.topic}}</h3>
             </a>
@@ -48,21 +49,24 @@
         <p> By: {{forum.profile}}</p>
         email: {{forum.profile.user.email}}
         <hr>
-        <h4>Comment from other users</h4>
+        <small>{{forum.num_comment}} Comments</small>
         <hr>
         {%for discuss in discussions%}
+
             {%for objs in discuss%}
                 {% if objs.forum == forum %}
-                    <div style="float: left; display: flex;">
+                    <div style="display: flex; flex-wrap: wrap;">
                         {% if objs.user == NULL %}
                             <p style="font-weight: bold;">@Unknow</p> : 
                         {% else %}
                             <p style="font-weight: bold;">@{{objs.user.username}}</p> : 
                         {% endif %}
-                        <p style="margin-left: 5px;">{{objs.discuss}}</p>
+                        <p style="margin-left: 5px; margin-bottom: 0;">{{objs.discuss}}</p>
+                        <a href="{% url 'likeComment' objs.id %}" style="flex: 0 0 100%; order: 1; margin-top: 0;">
+                            <span style="font-size: x-small; ">{{objs.like}} like</span>
+                        </a>
                     </div>
-
-                    <br>
+                       
                 {% endif %}
             {%endfor%}
         {%endfor%}
