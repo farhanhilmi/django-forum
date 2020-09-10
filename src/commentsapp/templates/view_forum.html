@@ -14,9 +14,24 @@
     <hr>
     <p>{{forum.description}}</p>
     <hr>
+    <span style="font-size: small;">{{forum.total}} Comments</span>
+    <hr>
     {% for dis in discuss %}
-        <p>{{dis.discuss}}</p>
+
+        <div style="display: flex; flex-wrap: wrap;">
+            {% if dis.user == NULL %}
+                <p style="font-weight: bold;">@Unknow</p> 
+            {% else %}
+                <p style="font-weight: bold;">@{{dis.user.username}}</p>  
+            {% endif %}
+            <p style="margin-left: 5px; margin-bottom: 0;">: {{dis.discuss}}</p>
+            <a href="{% url 'likeComment' dis.id %}" style="flex: 0 0 100%; order: 1; margin-top: 0;">
+                <span style="font-size: x-small; ">{{dis.like}} like</span>
+            </a>
+        </div>
+
     {% endfor %}
+    
 </body>
 
 </html>

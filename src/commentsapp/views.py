@@ -7,6 +7,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
 
+from django.http import HttpResponseRedirect
+
+
 from .models import *
 from .forms import *
 
@@ -49,22 +52,21 @@ def logoutPage(request):
 
 @login_required(login_url='login')
 def home(request):
-    users = request.user.profile.id
-    forums = forum.objects.all().annotate(total=Sum('profile'))
-  
+    forums = forum.objects.all().annotate(total=Sum('profile')).order_by('-date_created')
+    popular = forum.objects.all().order_by('num_comment')
+
     countForum = forums.count()
     discussions = []
 
     for i in forums:
         discussions.append(i.discussion_set.all())
 
-    context = {'forums': forums, 'countForum': countForum, 'discussions': discussions}
+    context = {'forums': forums, 'countForum': countForum, 'discussions': discussions, 'popular':popular}
     return render(request, 'home.html', context)
 
 def viewForum(request,pk):
-    forum_id = forum.objects.get(id=pk)
+    forum_id = forum.objects.annotate(total=Sum('profile')).get(id=pk)
     discuss_id = Discussion.objects.filter(forum_id=forum_id.id)
-    profiles = profile.objects.all()
     # print(discuss_id.discuss)
     # discuss = discuss_id.filter(forum=forum_id.topic)
 
@@ -96,13 +98,12 @@ def deleteForum(request,pk):
 
 
 def likeComment(request,pk):
-    form = Discussion.objects.get(id=pk)
-    data = form.save()
-    data.like = form.like + 1
-    data.save()
+    discuss = Discussion.objects.get(id=pk)
+    discuss.like = discuss.like + 1
+    discuss.save()
 
-    print(form.like)
     return redirect('/')
+
 
 def addInDiscussion(request,pk):
     forums = forum.objects.get(id=pk)

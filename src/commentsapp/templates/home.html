@@ -1,93 +1,62 @@
-{% load static %}
+{% extends 'layout/main.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
+{% block content %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FORUM DISCUSSION</title>
+<div class="container-fluid">
+    <div class="row mt-5">
+        <div class="col-2 sticky-top">
+            <h5>Categories</h5>
+            <ul>
+                <li>ada</li>
+                <li>ada</li>
+                <li>ada</li>
+                <li>ada</li>
+                <li>ada</li>
+                <li>ada</li>
+                <li>ada</li>
+                <li>ada</li>
+            </ul>
+        </div>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" 0>
+        
+        <div class="col-7" style="border-left:1px solid #e5e5e5;height:100%">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="">SELAMAT DATANG DI FORUM KAMI</h2>
+                    <a href="{% url 'addInForum' %}" class="btn btn-primary">Create Forum</a>
+                </div>
+                <h3>Forum Terbaru</h3>
 
-    <style>
-        .box {
-            border: 4px solid black;
-            margin: 0 auto;
-        }
-    </style>
-</head>
+                {% for forum in forums %}
+                <div class="mb-3">
+                    <a class="d-block font-weight-bold" href="{% url 'view_forum' forum.id %}">
+                        {{forum.topic}}
+                    </a>
+                        <small>By {{forum.profile.name}}</small> | <small>{{forum.date_created}}</small>
+                        <p class="mt-2">{{forum.description|truncatewords:40}} 
+                            <a href="{% url 'view_forum' forum.id %}">more</a> 
+                        </p>
+                        <small>{{forum.num_comment}} Comments</small>
+                </div>
+                <hr>
+                {% endfor %}
+            </div>
+        </div>
 
-<body>
-    <h2 class="jumbotron">
-        <p>Welcome, {{request.user.profile.name}}</p>
-        <a style="float: right;" href="{% url 'logout' %}">Logout</a>
-        Currently active forums: {{countForum}}
-        <form method="POST" action="{% url 'addInForum' %}">
-            {% csrf_token %}
-            <button class="btn btn-success" style="width:fit-content; padding: 4px; margin:10px;">Add more</button>
-        </form>
-    </h2>
-    <div class="card-columns" style="padding: 10px; margin: 20px;"></div>
-
-
-    {%for forum in forums %}
-
-    <div class="card box container">
-        <br>
-        <h5 class="card-title">
-            <!-- <a href='{{forum.link}}'> -->
-            <a href="{% url 'deleteForum' forum.id %}"><small>Hapus</small></a>
-            <a href="{% url 'view_forum' forum.id %}">
-                <h3>{{forum.topic}}</h3>
-            </a>
-            <div class="card-body container">
-                <p>{{forum.description}}</p>
-        </h5>
-        <hr>
-        <p> By: {{forum.profile}}</p>
-        email: {{forum.profile.user.email}}
-        <hr>
-        <small>{{forum.num_comment}} Comments</small>
-        <hr>
-        {%for discuss in discussions%}
-
-            {%for objs in discuss%}
-                {% if objs.forum == forum %}
-                    <div style="display: flex; flex-wrap: wrap;">
-                        {% if objs.user == NULL %}
-                            <p style="font-weight: bold;">@Unknow</p> : 
-                        {% else %}
-                            <p style="font-weight: bold;">@{{objs.user.username}}</p> : 
-                        {% endif %}
-                        <p style="margin-left: 5px; margin-bottom: 0;">{{objs.discuss}}</p>
-                        <a href="{% url 'likeComment' objs.id %}" style="flex: 0 0 100%; order: 1; margin-top: 0;">
-                            <span style="font-size: x-small; ">{{objs.like}} like</span>
-                        </a>
-                    </div>
-                       
-                {% endif %}
-            {%endfor%}
-        {%endfor%}
-     
-            <a href="{% url 'addInDiscussion' forum.id %}" class="btn btn-success" style="width:fit-content; padding: 4px; margin:10px;">Add more</a>
+        <div class="col-3">
+            <div>
+                <form class="form-inline my-2 my-lg-0">
+                    <input style="width: 200px;" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+            
+            <h5 class="mt-5">Popular Forums</h5>
+            {% for top in popular %}
+                <a class="d-block" href="{% url 'view_forum' top.id %}">{{top.topic}}</a>
+            {% endfor %}
+        </div>
     </div>
-    </div>
-    </div>
-    <br>
+</div>
 
-    {%endfor%}
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
-        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
-        crossorigin="anonymous"></script>
-</body>
-
-</html>
+{% endblock %}
