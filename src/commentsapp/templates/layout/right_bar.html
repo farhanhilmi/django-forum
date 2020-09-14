@@ -1,0 +1,13 @@
+<div class="col-3">
+    <div>
+        <form class="form-inline my-2 my-lg-0">
+            <input style="width: 200px;" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+    
+    <h5 class="mt-5">Popular Forums</h5>
+    {% for top in popular|slice:"10" %}
+        <a class="d-block font-weight-bold" href="{% url 'view_forum' top.id %}">{{top.topic}}</a>
+    {% endfor %}
+</div>

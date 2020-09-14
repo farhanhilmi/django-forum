@@ -9,6 +9,7 @@ from django.db.models import Count, Sum
 
 from django.http import HttpResponseRedirect
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import *
 from .forms import *
@@ -55,11 +56,24 @@ def home(request):
     forums = forum.objects.all().annotate(total=Sum('profile')).order_by('-date_created')
     popular = forum.objects.all().order_by('num_comment')
 
+    page = request.GET.get('page', 1)
+    paginator = Paginator(forums, 10)
+
     countForum = forums.count()
     discussions = []
 
     for i in forums:
         discussions.append(i.discussion_set.all())
+
+    try:
+        forums = paginator.page(page)
+    except PageNotAnInteger:
+        forums = paginator.page(1)
+    except EmptyPage:
+        forums = paginator.page(paginator.num_pages)
+    
+    print(forums)
+
 
     context = {'forums': forums, 'countForum': countForum, 'discussions': discussions, 'popular':popular}
     return render(request, 'home.html', context)

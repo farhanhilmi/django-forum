@@ -13,12 +13,17 @@ class profile(models.Model):
     def __str__(self):
         return str(self.name)
 
+class Category(models.Model):
+    category = models.CharField(max_length=200)
+
+
 #parent model
 class forum(models.Model):
     # discuss = models.OneToOneField(Discussion, blank=True, null=True, on_delete=models.SET_NULL)
     # name=models.CharField(max_length=200,default="anonymous" )
     profile = models.ForeignKey(profile, null=True, blank=True,on_delete=models.SET_NULL)
-    topic= models.CharField(max_length=300)
+    topic = models.CharField(max_length=300)
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
     description = models.CharField(max_length=1000,blank=True)
     num_comment = models.IntegerField(blank=True, null=True)
     date_created=models.DateTimeField(auto_now_add=True,null=True)
