@@ -40,7 +40,8 @@ INSTALLED_APPS = [
 
     'commentsapp.apps.CommentsappConfig',
 
-    'crispy_forms'
+    'crispy_forms',
+    
 
 ]
 

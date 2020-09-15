@@ -15,8 +15,13 @@
                     <a href="{% url 'addInForum' %}" class="btn btn-primary">Create Forum</a>
                 </div>
                 <h3>Forum Terbaru</h3>
-                
-                {% for forum in forums %}
+                {% load define_action %}
+
+                {% for items_forum in forums %}
+                {% if items_forum %}
+                    {% define items_forum as items %}
+               
+                {% with forum=items %}
                 <div class="mb-3">
                     <a class="d-block font-weight-bold" href="{% url 'view_forum' forum.id %}">
                         {{forum.topic}}
@@ -35,6 +40,8 @@
                         <small>{{forum.num_comment}} Comments</small>
                 </div>
                 <hr>
+                    {% endwith %}
+                {% endif %}
                 {% endfor %}
 
                 {% if forums.has_other_pages %}

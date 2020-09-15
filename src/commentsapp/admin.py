@@ -5,3 +5,4 @@ from .models import *
 admin.site.register(forum)
 admin.site.register(Discussion)
 admin.site.register(profile)
+admin.site.register(Category)

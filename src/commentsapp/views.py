@@ -55,6 +55,7 @@ def logoutPage(request):
 def home(request):
     forums = forum.objects.all().annotate(total=Sum('profile')).order_by('-date_created')
     popular = forum.objects.all().order_by('num_comment')
+    category = Category.objects.all().order_by('category')
 
     page = request.GET.get('page', 1)
     paginator = Paginator(forums, 10)
@@ -72,11 +73,54 @@ def home(request):
     except EmptyPage:
         forums = paginator.page(paginator.num_pages)
     
+
+    context = {'forums': forums, 'countForum': countForum, 
+    'discussions': discussions, 'popular':popular, 'category':category}
+    return render(request, 'home.html', context)
+
+def categoryPage(request,pk):
+    popular = forum.objects.all().order_by('num_comment')
+    category = Category.objects.all().order_by('category')
+    # filter_category = category.filter(category__contains=name)
+    filter_category = forum.objects.filter(category_id=pk)
+    print(filter_category)
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(filter_category, 10)
+
+    try:
+        filter_category = paginator.page(page)
+    except PageNotAnInteger:
+        filter_category = paginator.page(1)
+    except EmptyPage:
+        filter_category = paginator.page(paginator.num_pages)
+
+    print(filter_category)
+
+    context = {'forums':filter_category, 'category':category, 'popular':popular}
+    return render(request, 'home.html', context)
+
+def searchPage(request,name):
+    popular = forum.objects.all().order_by('num_comment')
+    category = Category.objects.all().order_by('category')
+    forums = forum.objects.all().filter(topic__contains=name)
+    # forums = forum.objects.filter(category_id=pk)
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(forums, 10)
+
+    try:
+        forums = paginator.page(page)
+    except PageNotAnInteger:
+        forums = paginator.page(1)
+    except EmptyPage:
+        forums = paginator.page(paginator.num_pages)
+
     print(forums)
 
-
-    context = {'forums': forums, 'countForum': countForum, 'discussions': discussions, 'popular':popular}
+    context = {'forums':forums, 'category':category, 'popular':popular}
     return render(request, 'home.html', context)
+
 
 def viewForum(request,pk):
     forum_id = forum.objects.annotate(total=Sum('profile')).get(id=pk)
@@ -90,6 +134,9 @@ def viewForum(request,pk):
 def addInForum(request):
     # profiles = request.user.profile
     form = CreateInForum()
+    popular = forum.objects.all().order_by('num_comment')
+    category = Category.objects.all().order_by('category')
+
     # print(forum)
     # print(profiles)
     if request.method == 'POST':
@@ -101,7 +148,7 @@ def addInForum(request):
             data.save()
             return redirect('/')
 
-    context = {'form': form}
+    context = {'form': form, 'category':category, 'popular':popular}
     return render(request, 'addInForum.html', context)
 
 def deleteForum(request,pk):

@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, Textarea
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -10,6 +10,9 @@ class CreateInForum(ModelForm):
         model = forum
         fields = "__all__"
         exclude = ['profile','num_comment']
+        widgets = {
+            "description": Textarea(attrs={'cols':80, 'rows':20}),
+        }
 
     # def __init__(self, *args, **kwargs):
     #     self._profile = kwargs.pop('profile')

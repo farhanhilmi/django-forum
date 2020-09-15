@@ -1,13 +1,10 @@
 <div class="col-2 sticky-top">
     <h5>Categories</h5>
+    <hr>
     <ul>
-        <li>ada</li>
-        <li>ada</li>
-        <li>ada</li>
-        <li>ada</li>
-        <li>ada</li>
-        <li>ada</li>
-        <li>ada</li>
-        <li>ada</li>
+        {% for cat in category %}
+            <li><a href="{% url 'category' cat.id %}">{{cat}}</a></li>
+        {% endfor %}
+       
     </ul>
 </div>
