@@ -38,10 +38,10 @@
                         {{request.user.profile.name}}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">My Proflie</a>
-                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="{% url 'myProfile' request.user.username %}">My Profile</a>
+                        {% comment %} <a class="dropdown-item" href="#">Another action</a> {% endcomment %}
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'logout' %">Logout</a>
+                        <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                     </div>
                 </li>
             </ul>

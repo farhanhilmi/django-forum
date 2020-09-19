@@ -1,0 +1,13 @@
+{% extends 'layout/main.html' %}
+{% block content %}
+
+<h3>PROFILE PAGE, {{data.name}}</h3>
+<p>First Name : {{data.user.first_name}}</p>
+<p>Last Name : {{data.user.last_name}}</p>
+<p>Email : {{data.user.email}}</p>
+<p>Phone : {{data.phone}}</p>
+<p>Username : {{data.user.username}}</p>
+<p>Password : {{data.user.password}}</p>
+<p>Joined : {{data.date_created}}</p>
+
+{% endblock %}

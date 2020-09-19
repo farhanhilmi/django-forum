@@ -6,11 +6,13 @@ urlpatterns = [
     path('', views.home, name='home'),
 
     path('login/', views.loginPage, name='login'),
-    path('register/', views.regiterPage, name='register'),
+    path('register/', views.registerPage, name='register'),
     path('logout/', views.logoutPage, name='logout'),
 
+    path('profile/<str:username>', views.myProfilePage, name='myProfile'),
+
     path('category/<str:pk>', views.categoryPage, name='category'),
-    path('search/<str:name>', views.searchPage, name='search'),
+    path('search/?$', views.searchPage, name='search'),
 
     path('view_forum/<str:pk>', views.viewForum, name='view_forum'),
     path('addInForum/', views.addInForum, name='addInForum'),

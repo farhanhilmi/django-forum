@@ -3,7 +3,7 @@
     <hr>
     <ul>
         {% for cat in category %}
-            <li><a href="{% url 'category' cat.id %}">{{cat}}</a></li>
+            <li><a class="font-weight-bold" href="{% url 'category' cat.id %}">{{cat}}</a></li>
         {% endfor %}
        
     </ul>

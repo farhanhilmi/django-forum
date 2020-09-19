@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
-from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
 
 from django.http import HttpResponseRedirect
@@ -16,7 +16,7 @@ from .forms import *
 
 # Create your views here.
 
-def regiterPage(request):
+def registerPage(request):
     form = CreateUser()
 
     if request.method == 'POST':
@@ -47,21 +47,26 @@ def loginPage(request):
     context = {}
     return render(request, 'auth/login.html', context)
 
+@login_required(login_url='login')
 def logoutPage(request):
     logout(request)
     return redirect('login')
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def home(request):
     forums = forum.objects.all().annotate(total=Sum('profile')).order_by('-date_created')
     popular = forum.objects.all().order_by('num_comment')
     category = Category.objects.all().order_by('category')
+
+    title = "Lates Forum"
 
     page = request.GET.get('page', 1)
     paginator = Paginator(forums, 10)
 
     countForum = forums.count()
     discussions = []
+
+    print(request.user.id)
 
     for i in forums:
         discussions.append(i.discussion_set.all())
@@ -75,15 +80,27 @@ def home(request):
     
 
     context = {'forums': forums, 'countForum': countForum, 
-    'discussions': discussions, 'popular':popular, 'category':category}
+    'discussions': discussions, 'popular':popular, 'category':category, 'title':title}
     return render(request, 'home.html', context)
+
+def myProfilePage(request, username):
+    user = User.objects.get(username=username)
+    data = profile.objects.get(user_id=user.id)
+    forums = forum.objects.all().filter(profile_id=data.id)
+
+    print(forums)
+    context = {'data':data, 'forums':forums}
+    return render(request, 'profile.html', context)
 
 def categoryPage(request,pk):
     popular = forum.objects.all().order_by('num_comment')
     category = Category.objects.all().order_by('category')
     # filter_category = category.filter(category__contains=name)
     filter_category = forum.objects.filter(category_id=pk)
-    print(filter_category)
+
+    # cat = category.filter(id=pk).cat.first()
+    # print(cat.first())
+    title = str(category.filter(id=pk).first()) +  " category"
 
     page = request.GET.get('page', 1)
     paginator = Paginator(filter_category, 10)
@@ -95,16 +112,19 @@ def categoryPage(request,pk):
     except EmptyPage:
         filter_category = paginator.page(paginator.num_pages)
 
-    print(filter_category)
+    
 
-    context = {'forums':filter_category, 'category':category, 'popular':popular}
+    context = {'forums':filter_category, 'category':category, 'popular':popular, 'title':title}
     return render(request, 'home.html', context)
 
-def searchPage(request,name):
+def searchPage(request):
     popular = forum.objects.all().order_by('num_comment')
     category = Category.objects.all().order_by('category')
+    name = request.GET.get("searchVal")
     forums = forum.objects.all().filter(topic__contains=name)
     # forums = forum.objects.filter(category_id=pk)
+
+    title = "Search Result"
 
     page = request.GET.get('page', 1)
     paginator = Paginator(forums, 10)
@@ -118,9 +138,8 @@ def searchPage(request,name):
 
     print(forums)
 
-    context = {'forums':forums, 'category':category, 'popular':popular}
+    context = {'forums':forums, 'category':category, 'popular':popular, 'title':title}
     return render(request, 'home.html', context)
-
 
 def viewForum(request,pk):
     forum_id = forum.objects.annotate(total=Sum('profile')).get(id=pk)
@@ -131,6 +150,7 @@ def viewForum(request,pk):
     context = {'forum': forum_id, 'discuss': discuss_id}
     return render(request, 'view_forum.html', context)
 
+@login_required(login_url='login')
 def addInForum(request):
     # profiles = request.user.profile
     form = CreateInForum()
@@ -151,13 +171,16 @@ def addInForum(request):
     context = {'form': form, 'category':category, 'popular':popular}
     return render(request, 'addInForum.html', context)
 
+@login_required(login_url='login')
 def deleteForum(request,pk):
     forums = forum.objects.get(id=pk)
-  
-    forums.delete()
+
+    if forums.profile.user.id == request.user.id:
+        forums.delete()
+
     return redirect('/')
 
-
+@login_required(login_url='login')
 def likeComment(request,pk):
     discuss = Discussion.objects.get(id=pk)
     discuss.like = discuss.like + 1
@@ -165,7 +188,7 @@ def likeComment(request,pk):
 
     return redirect('/')
 
-
+@login_required(login_url='login')
 def addInDiscussion(request,pk):
     forums = forum.objects.get(id=pk)
     comment = updateCommentForm(instance=forums)

@@ -1,4 +1,5 @@
 {% extends 'layout/main.html' %}
+<!-- {% load static %} -->
 
 {% block content %}
 
@@ -14,10 +15,11 @@
                     <h2 class="">SELAMAT DATANG DI FORUM KAMI</h2>
                     <a href="{% url 'addInForum' %}" class="btn btn-primary">Create Forum</a>
                 </div>
-                <h3>Forum Terbaru</h3>
+                <h3 class="title-forumList">{{title}}</h3>
                 {% load define_action %}
 
                 {% for items_forum in forums %}
+                
                 {% if items_forum %}
                     {% define items_forum as items %}
                
@@ -25,10 +27,14 @@
                 <div class="mb-3">
                     <a class="d-block font-weight-bold" href="{% url 'view_forum' forum.id %}">
                         {{forum.topic}}
-                    </a>
+                    </a> 
+                    {% if forum.profile.user.id == request.user.id %}
+                        <a href="{% url 'deleteForum' forum.id %}" class="badge badge-danger">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </a>
+                    {% endif %}
                         <small>By {{forum.profile.name}}</small> | <small>{{forum.date_created}}</small>
                         <p class="mt-2">
-                        {% comment %} {{forum.description|truncatewords:40}}  {% endcomment %}
                             {{forum.description|truncatewords:40}}
 
                             {% if forum.description|wordcount > 40 %}
@@ -42,6 +48,13 @@
                 <hr>
                     {% endwith %}
                 {% endif %}
+                {% empty %}
+
+                <div class="empty text-center font-weight-bold">
+                    <p>Oops!</p>
+                    <p>Forum Not Found</p>
+                </div>
+               
                 {% endfor %}
 
                 {% if forums.has_other_pages %}
