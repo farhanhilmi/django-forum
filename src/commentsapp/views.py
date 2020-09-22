@@ -57,9 +57,9 @@ def logoutPage(request):
 # @login_required(login_url='login')
 def home(request):
     forums = forum.objects.all().annotate(total=Sum('profile')).order_by('-date_created')
-    popular = forum.objects.all().order_by('num_comment')
+    popular = forum.objects.all().order_by('-num_comment')
     category = Category.objects.all().order_by('category')
-
+    print(popular)
     title = "Lates Forum"
 
     page = request.GET.get('page', 1)
@@ -95,7 +95,7 @@ def myProfilePage(request, username):
     return render(request, 'profile.html', context)
 
 def categoryPage(request,pk):
-    popular = forum.objects.all().order_by('num_comment')
+    popular = forum.objects.all().order_by('-num_comment')
     category = Category.objects.all().order_by('category')
     # filter_category = category.filter(category__contains=name)
     filter_category = forum.objects.filter(category_id=pk)
@@ -120,7 +120,7 @@ def categoryPage(request,pk):
     return render(request, 'home.html', context)
 
 def searchPage(request):
-    popular = forum.objects.all().order_by('num_comment')
+    popular = forum.objects.all().order_by('-num_comment')
     category = Category.objects.all().order_by('category')
     name = request.GET.get("searchVal")
     forums = forum.objects.all().filter(topic__contains=name)
@@ -147,7 +147,7 @@ def viewForum(request,pk):
     forum_id = forum.objects.annotate(total=Sum('profile')).get(id=pk)
     discuss_id = Discussion.objects.filter(forum_id=forum_id.id).order_by('-date_created')
 
-    popular = forum.objects.all().order_by('num_comment')
+    popular = forum.objects.all().order_by('-num_comment')
     category = Category.objects.all().order_by('category')
 
     page = request.GET.get('page', 1)
@@ -193,7 +193,7 @@ def viewForum(request,pk):
 def addInForum(request):
     # profiles = request.user.profile
     form = CreateInForum()
-    popular = forum.objects.all().order_by('num_comment')
+    popular = forum.objects.all().order_by('-num_comment')
     category = Category.objects.all().order_by('category')
 
     # print(forum)

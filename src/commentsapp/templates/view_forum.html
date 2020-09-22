@@ -17,7 +17,12 @@
                 <div class="mt-4">
                     <p>{{forum.description}}</p>
                 </div>
-                <span class="badge badge-secondary mt-3">{{forum.category}}</span>
+                {% if forum.profile.user.id == request.user.id %}
+                    <a href="{% url 'deleteForum' forum.id %}" class="badge badge-danger" title="Delete this forum">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </a>
+                {% endif %}
+                <a href="{% url 'category' forum.category.id %}"><span class="badge badge-secondary mt-3">{{forum.category}}</span></a>
                 <hr>        
                 <span style="font-size: small;">{{forum.num_comment}} Comments</span>
                 <hr>
