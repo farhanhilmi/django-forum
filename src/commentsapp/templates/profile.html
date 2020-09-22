@@ -1,6 +1,20 @@
 {% extends 'layout/main.html' %}
-{% block content %}
+{% load static %}
 
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-6">
+            <div class="container">
+                <!-- <img class="profile_pic" src="{{request.user.profile.profile_pic.url}}"> -->
+                <img src="{{request.user.profile.profile_pic.url}}" class="pic rounded float-left" alt="...">
+            </div>
+        </div>
+
+        <div class="col-6" style="background-color: aqua;">
+            <div class="container">
+                
 <h3>PROFILE PAGE, {{data.name}}</h3>
 <p>First Name : {{data.user.first_name}}</p>
 <p>Last Name : {{data.user.last_name}}</p>
@@ -9,5 +23,10 @@
 <p>Username : {{data.user.username}}</p>
 <p>Password : {{data.user.password}}</p>
 <p>Joined : {{data.date_created}}</p>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 {% endblock %}

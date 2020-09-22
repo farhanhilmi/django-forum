@@ -1,4 +1,97 @@
-<!DOCTYPE html>
+{% extends 'layout/main.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row mt-5">
+
+        {% include 'layout/left_bar.html' %}
+        
+        <div class="col-7" style="border-left:1px solid #e5e5e5;height:100%">
+            <div class="container">
+                <div>
+                    <h4>{{forum.topic}}</h4>
+                    <small>By: {{forum.profile}} | {{forum.date_created}}</small><br>
+                </div>
+                <div class="mt-4">
+                    <p>{{forum.description}}</p>
+                </div>
+                <span class="badge badge-secondary mt-3">{{forum.category}}</span>
+                <hr>        
+                <span style="font-size: small;">{{forum.num_comment}} Comments</span>
+                <hr>
+
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    {{form.as_p}}
+                    {{comment.num_comment.as_hidden}}
+                    {{form.forum.id}}
+                    <input type="submit" class="btn btn-small btn-primary" value="submit">
+                </form>
+
+                <hr>
+                <div>
+                    {% for dis in discuss %}
+                
+                    <div style="display: flex; flex-wrap: wrap;">
+                        {% if dis.user == NULL %}
+                        <p style="font-weight: bold;">@Unknow</p>
+                        {% else %}
+                        <p style="font-weight: bold;">@{{dis.user.username}}</p>
+                        {% endif %}
+                        <p style="margin-left: 5px; margin-bottom: 0;">: {{dis.discuss}}</p>
+                    </div>
+                    <small>{{dis.date_created}}</small>
+                    <hr>
+                    {% endfor %}
+                </div>
+
+                {% if discuss.has_other_pages %}
+                <div class="d-flex justify-content-center">
+                    <ul class="pagination">
+                        {% if discuss.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" tabindex="-1" aria-disabled="true" href="?page={{ discuss.previous_page_number }}">Previous</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" tabindex="-1" aria-disabled="true">Previous</a>
+                            </li>
+                        {% endif %}
+                        {% for i in discuss.paginator.page_range %}
+                            {% if discuss.number == i %}
+                                <li class="page-item active" aria-current="page">
+                                    <a class="page-link">{{ i }} <span class="sr-only">(current)</span></a>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ i }}">{{i}}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if discuss.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ discuss.next_page_number }}">Next</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" tabindex="-1" aria-disabled="true">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include 'layout/right_bar.html' %}
+    </div>
+</div>
+
+{% endblock %}
+
+<!-- {% comment %} <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -34,4 +127,4 @@
     
 </body>
 
-</html>
+</html> {% endcomment %} -->

@@ -37,8 +37,12 @@ class CreateInDiscussion(ModelForm):
         model= Discussion
         fields = "__all__"
         exclude = ['forum','user','like']
+        widgets = {
+            "discuss": Textarea(attrs={'cols':90, 'rows':5}),
+        }
 
 class CreateUser(UserCreationForm):
     class Meta:
         model = User
         fields = ['username','email','password1','password2','first_name','last_name']
+        

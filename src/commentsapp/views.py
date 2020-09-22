@@ -5,6 +5,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
+from django.http import HttpResponseRedirect
+
 from django.db.models import Count, Sum
 
 from django.http import HttpResponseRedirect
@@ -88,7 +90,7 @@ def myProfilePage(request, username):
     data = profile.objects.get(user_id=user.id)
     forums = forum.objects.all().filter(profile_id=data.id)
 
-    print(forums)
+    print(request.user.profile.profile_pic)
     context = {'data':data, 'forums':forums}
     return render(request, 'profile.html', context)
 
@@ -143,11 +145,48 @@ def searchPage(request):
 
 def viewForum(request,pk):
     forum_id = forum.objects.annotate(total=Sum('profile')).get(id=pk)
-    discuss_id = Discussion.objects.filter(forum_id=forum_id.id)
+    discuss_id = Discussion.objects.filter(forum_id=forum_id.id).order_by('-date_created')
+
+    popular = forum.objects.all().order_by('num_comment')
+    category = Category.objects.all().order_by('category')
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(discuss_id, 10)
+
+    try:
+        discuss_id = paginator.page(page)
+    except PageNotAnInteger:
+        discuss_id = paginator.page(1)
+    except EmptyPage:
+        discuss_id = paginator.page(paginator.num_pages)
+
+
+    comment = updateCommentForm(instance=forum_id)
+    form = CreateInDiscussion()
+    if request.method == 'POST':
+        comment = updateCommentForm(request.POST, instance=forum_id)
+        form = CreateInDiscussion(request.POST)
+        if form.is_valid() and comment.is_valid():
+            dataComment = comment.save()
+            data = form.save()
+            dataComment.num_comment = forum_id.num_comment + 1
+            data.forum = forum.objects.get(id=pk)
+            data.user = User.objects.get(id=request.user.id)
+            data.like = 0
+
+            dataComment.save()
+            data.save()
+
+            # return redirect('/view_forum')
+            return HttpResponseRedirect(request.path_info)
+    
+
+    
     # print(discuss_id.discuss)
     # discuss = discuss_id.filter(forum=forum_id.topic)
 
-    context = {'forum': forum_id, 'discuss': discuss_id}
+    context = {'forum': forum_id, 'discuss': discuss_id, 'popular':popular, 
+    'category':category, 'form': form,'comment': comment}
     return render(request, 'view_forum.html', context)
 
 @login_required(login_url='login')
@@ -192,9 +231,6 @@ def likeComment(request,pk):
 def addInDiscussion(request,pk):
     forums = forum.objects.get(id=pk)
     comment = updateCommentForm(instance=forums)
-    
-    print(type(forums.num_comment))
-    print(forums.num_comment)
 
     form = CreateInDiscussion()
     if request.method == 'POST':

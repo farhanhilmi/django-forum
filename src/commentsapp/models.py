@@ -9,7 +9,9 @@ class profile(models.Model):
     user = models.OneToOneField(User, null=True, blank=True,on_delete=models.CASCADE)
     name = models.CharField(max_length=200,default="anonymous")
     phone = models.CharField(max_length=200, null=True)
+    profile_pic = models.ImageField(null=True, blank=True, default="default-profile.png")
     date_created = models.DateTimeField(auto_now_add=True, null=True)
+
 
     def __str__(self):
         return str(self.name)
@@ -40,6 +42,7 @@ class Discussion(models.Model):
     forum = models.ForeignKey(forum,blank=True, null=True, on_delete=models.CASCADE)
     discuss = models.CharField(max_length=1000)
     like = models.IntegerField(blank=True, null=True)
- 
+    date_created=models.DateTimeField(auto_now_add=True,null=True)
+    
     def __str__(self):
         return str(self.discuss)
